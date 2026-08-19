@@ -1,1 +1,3 @@
-
+create table users (id uuid primary key default gen_random_uuid(), name text, email text unique, password text, balance numeric default 0);
+create table transactions (id uuid primary key default gen_random_uuid(), user_id uuid references users(id), type text, amount numeric, note text, due_date date, created_at timestamp default now());
+create table withdrawals (id uuid primary key default gen_random_uuid(), user_id uuid references users(id), amount numeric, bank text, account_name text, account_number text, status text default 'Pending', created_at timestamp default now());
