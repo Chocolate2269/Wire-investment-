@@ -1,1 +1,10 @@
-
+<!DOCTYPE html><html><head><title>Register</title><script type="importmap">{"imports":{"supabase":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"}}</script>
+<style>body{background:linear-gradient(135deg,#008751,#0a1f44); font-family:Arial; text-align:center; padding:40px; color:white;}
+.box{background:white; color:#0a1f44; padding:30px; border-radius:15px; max-width:400px; margin:auto; border:3px solid #FFD700;}
+input,button{padding:12px; margin:8px; width:90%; border-radius:8px; border:1px solid #ccc;}.btn{background:#FFD700; color:#0a1f44; font-weight:bold; border:none; cursor:pointer;}</style></head>
+<body><div class="box"><img src="logo.png" style="height:50px;"><h2>🏆 Join The Tournament</h2>
+<input id="name" placeholder="Full Name"><br><input id="email" type="email" placeholder="Email"><br>
+<input id="pass" type="password" placeholder="Password"><br><button class="btn" onclick="register()">Register Now</button></div>
+<script type="module">import { supabase } from './config.js';
+window.register = async function(){let { data, error } = await supabase.from('users').insert([{name:name.value, email:email.value, password:pass.value, balance:0}]).select();
+if(error){alert(error.message)} else{ localStorage.setItem('user_id', data[0].id); window.location='dashboard.html'; }}</script></body></html>
