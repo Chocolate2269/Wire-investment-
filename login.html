@@ -1,1 +1,10 @@
-
+<!DOCTYPE html><html><head><title>Login</title><script type="importmap">{"imports":{"supabase":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"}}</script>
+<style>body{background:linear-gradient(135deg,#008751,#0a1f44); font-family:Arial; text-align:center; padding:40px; color:white;}
+.box{background:white; color:#0a1f44; padding:30px; border-radius:15px; max-width:400px; margin:auto; border:3px solid #FFD700;}
+input,button{padding:12px; margin:8px; width:90%; border-radius:8px; border:1px solid #ccc;}.btn{background:#FFD700; color:#0a1f44; font-weight:bold; border:none; cursor:pointer;}</style></head>
+<body><div class="box"><img src="logo.png" style="height:50px;"><h2>⚽ Player Login</h2>
+<input id="email" type="email" placeholder="Email"><br><input id="pass" type="password" placeholder="Password"><br>
+<button class="btn" onclick="login()">Enter Field</button></div>
+<script type="module">import { supabase } from './config.js';
+window.login = async function(){let { data } = await supabase.from('users').select('*').eq('email', email.value).eq('password', pass.value).single();
+if(data){ localStorage.setItem('user_id', data.id); window.location='dashboard.html'; } else{ alert('Login failed') }}</script></body></html>
