@@ -1092,30 +1092,5 @@
             setTimeout(() => {
                 let currentLog = JSON.parse(localStorage.getItem('wire_net_chat'));
                 let replyText = "Thank you for reaching out. A dedicated Wire risk officer is reviewing your query and will respond shortly.";
-                const lower = text.toLowerCase();
-                if (lower.includes('deposit') || lower.includes('fund')) {
-                    replyText = "Deposits are processed via USDT/Crypto and credited to your ledger within 10-30 minutes upon admin verification of your TXID.";
-                } else if (lower.includes('roi') || lower.includes('daily') || lower.includes('profit')) {
-                    replyText = "Daily ROI ranges from 5% to 25% depending on your active strategy tier. Use the 'Sim 24h ROI' button in your client dashboard to test accruals instantly!";
-                } else if (lower.includes('withdraw')) {
-                    replyText = "Withdrawals are processed instantly once requested from your available balance. Ensure your destination crypto address or bank detail is accurate.";
-                }
 
-                currentLog.push({ sender: 'support', text: replyText, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-                localStorage.setItem('wire_net_chat', JSON.stringify(currentLog));
-                renderChatMessages();
-                showToaster('New message received from Wire Support.', 'success');
-            }, 1200);
-        }
-
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref');
-            if (refParam) {
-                localStorage.setItem('wire_net_ref_track', refParam);
-            }
-            navigate('about');
-        };
-    </script>
-</body>
 </html>
