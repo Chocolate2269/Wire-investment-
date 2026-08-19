@@ -1,1 +1,27 @@
-
+<!DOCTYPE html><html><head><title>Admin</title><script type="importmap">{"imports":{"supabase":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"}}</script>
+<style>body{background:#0a1f44; font-family:Arial; color:white; margin:0;}.header{background:#008751; padding:20px; text-align:center; border-bottom:4px solid #FFD700;}
+.container{max-width:1100px; margin:20px auto; padding:20px;}.box{background:white; color:#0a1f44; padding:25px; border-radius:12px; margin-bottom:20px; border:3px solid #FFD700;}
+.btn{background:#FFD700; color:#0a1f44; font-weight:bold; cursor:pointer; border:none; padding:10px;}.btn-paid{background:#008751; color:white;}
+table{width:100%; border-collapse:collapse;} th,td{border:1px solid #ddd; padding:10px;}</style></head>
+<body><script>let pass=prompt("Admin Password"); if(pass!="WIRE2026") window.location='index.html';</script>
+<div class="header"><h1>🏆 Admin Control Room</h1></div>
+<div class="container">
+<div class="box"><h2>📥 Pending Withdrawals</h2><table id="withdrawTable"></table></div>
+<div class="box"><h2>👥 All Users</h2><table id="userTable"></table></div>
+</div>
+<script type="module">import { supabase, RESEND_KEY } from './config.js';
+async function load(){
+  let {data:users} = await supabase.from('users').select('*');
+  document.getElementById('userTable').innerHTML = "<tr><th>Name</th><th>Email</th><th>Balance</th></tr>" + users.map(u=>`<tr><td>${u.name}</td><td>${u.email}</td><td>$${u.balance}</td></tr>`).join('');
+  let {data:ws} = await supabase.from('withdrawals').select('*, users(name,email)').eq('status','Pending');
+  document.getElementById('withdrawTable').innerHTML = "<tr><th>Player</th><th>Amount</th><th>Bank</th><th>Account</th><th>Action</th></tr>" +
+  ws.map(w=>`<tr><td>${w.users.name}</td><td>$${w.amount}</td><td>${w.bank}</td><td>${w.account_name}<br>${w.account_number}</td>
+  <td><button class="btn btn-paid" onclick="markPaid('${w.id}','${w.users.email}',${w.amount})">Mark Paid</button></td></tr>`).join('');
+}
+window.markPaid = async function(id, userEmail, amount){
+  await supabase.from('withdrawals').update({status:'Paid'}).eq('id',id);
+  fetch('https://api.resend.com/emails', {method: 'POST', headers: {'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json'},
+    body: JSON.stringify({from: 'WIRE-UNLIMITED <alerts@wire-unlimited.com>', to: userEmail, subject: `Withdrawal Paid - $${amount}`, html: `<p>Your $${amount} withdrawal is PAID</p>`})});
+  alert('Marked Paid + Email Sent'); load();
+}
+load();</script></body></html>
