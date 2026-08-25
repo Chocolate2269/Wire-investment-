@@ -1,4 +1,18 @@
-<!DOCTYPE html><html><head><title>Register</title><script type="importmap">{"imports":{"supabase":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"}}</script>
+// Add this call inside your platform's register/sign-up handler
+async function syncNewUserToAdmin(userEmail, userCountry) {
+    try {
+        await fetch('https://crypto-admin.onrender.com/api/register-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: userEmail,
+                country: userCountry
+            })
+        });
+    } catch (err) {
+        console.error('Failed to sync user to admin dashboard:', err);
+    }
+}<!DOCTYPE html><html><head><title>Register</title><script type="importmap">{"imports":{"supabase":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"}}</script>
 <style>body{background:linear-gradient(135deg,#008751,#0a1f44); font-family:Arial; text-align:center; padding:40px; color:white;}
 .box{background:white; color:#0a1f44; padding:30px; border-radius:15px; max-width:400px; margin:auto; border:3px solid #FFD700;}
 input,button{padding:12px; margin:8px; width:90%; border-radius:8px; border:1px solid #ccc;}.btn{background:#FFD700; color:#0a1f44; font-weight:bold; border:none; cursor:pointer;}</style></head>
