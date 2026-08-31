@@ -1,3 +1,3 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
-export const supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY') 
-export const RESEND_KEY = 'YOUR_RESEND_KEY'
+// Wire Coincheap Supabase Config
+const SUPABASE_URL = 'https://bfhtnvlpasasad-rpvjoe.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmaHRudmxwYXNhc2FkcnB2am9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MzQ4NzksImV4cCI6MjEwMzUxMDg3OX0.xpThftPz49BNgghmx0wXPKfBC1agSUdJOI_taJivjaU'
